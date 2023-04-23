@@ -1,12 +1,7 @@
-
-# Feature Added : 
-# 1) pause - rohan
-# 2) stop - blussei
-
-
 import tkinter as tk
 from tkinter import filedialog
 import pygame
+import pytube
 
 class MusicPlayer:
     def __init__(self, master):
@@ -28,6 +23,14 @@ class MusicPlayer:
         # Create a button for stopping the file
         self.stop_button = tk.Button(master, text="Stop", command=self.stop_music, state=tk.DISABLED)
         self.stop_button.pack()
+
+        # Create an input box for entering YouTube video link
+        self.link_entry = tk.Entry(master, width=40)
+        self.link_entry.pack()
+
+        # Create a button for downloading the YouTube video
+        self.download_button = tk.Button(master, text="Download", command=self.download_music)
+        self.download_button.pack()
 
         # Set initial state of pause button and stop button to disabled
         self.paused = False
@@ -66,8 +69,27 @@ class MusicPlayer:
         self.pause_button.config(state=tk.DISABLED)
         self.stop_button.config(state=tk.DISABLED)
 
+    def download_music(self):
+        # Get the YouTube video link from the input box
+        link = self.link_entry.get()
+
+        # Create a YouTube object and get the highest quality audio stream
+        youtube = pytube.YouTube(link)
+        audio_stream = youtube.streams.get_audio_only()
+
+        # Ask the user to choose a file name and location to save the audio file
+        save_path = filedialog.asksaveasfilename(initialdir="/", title="Save File", defaultextension=".mp3", filetypes=(("Audio Files", "*.mp3"), ("all files", "*.*")))
+
+        # Download the audio file
+        audio_stream.download(output_path=".", filename="temp")
+        temp_file_path = "temp." + audio_stream.mime_type.split("/")[-1]
+        os.rename(temp_file_path, save_path)
+
+        print("Downloaded:", save_path)
+
 root = tk.Tk()
-root.geometry("400x200")
+root.geometry("400x250")
 root.title("Music Player")
 my_player = MusicPlayer(root)
 root.mainloop()
+git 
